@@ -1,0 +1,43 @@
+# Built binaries and outputs
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+**/build/
+build/
+/captures
+
+# Gradle files and caches
+.gradle/
+.kotlin/
+replay_pid*.log
+*.log
+
+# Machine and SDK specific settings
+local.properties
+.externalNativeBuild
+.cxx
+
+# IntelliJ IDEA / Android Studio
+*.iml
+.idea/
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+
+# Keystore and credentials
+*.jks
+*.keystore
+*.p12
+*.key
+signing.properties
+credentials.json
+google-services.json
+
+# OS and temporary files
+.DS_Store
+Thumbs.db
