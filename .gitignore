@@ -6,6 +6,7 @@
 *.class
 **/build/
 build/
+dist/
 /captures
 
 # Gradle files and caches
@@ -34,6 +35,7 @@ local.properties
 *.keystore
 *.p12
 *.key
+keystore/
 signing.properties
 credentials.json
 google-services.json
