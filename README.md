@@ -10,7 +10,7 @@
   [![Language](https://img.shields.io/badge/Kotlin-2.3.20-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)](https://kotlinlang.org)
   [![Toolkit](https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white)](https://developer.android.com/jetpack/compose)
   [![Architecture](https://img.shields.io/badge/Architecture-Offline--First%20%7C%20UDF-009688?style=for-the-badge)]()
-  [![Release](https://img.shields.io/badge/Version-1.0.0-blue?style=for-the-badge)](https://github.com/Dr-SuBZeRo/CashQ/releases)
+  [![Release](https://img.shields.io/badge/Version-1.1.0-blue?style=for-the-badge)](https://github.com/Dr-SuBZeRo/CashQ/releases)
 
   <p align="center">
     Designed for retail cashiers, pharmacies, clinics, small businesses, and daily personal cash management. Count notes and coins with real-time calculations, zero cloud dependencies, and zero tracking.
@@ -28,7 +28,7 @@
 
 - **Developer:** SuBZeRo
 - **Application ID:** `com.cashq`
-- **Current Version:** `1.0.0` (`versionCode 1`)
+- **Current Version:** `1.1.0` (`versionCode 2`)
 - **Min SDK:** Android 8.0 (API 26)
 - **Target / Compile SDK:** Android 16 (API 36)
 
