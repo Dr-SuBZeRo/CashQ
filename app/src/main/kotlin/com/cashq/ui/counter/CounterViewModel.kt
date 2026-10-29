@@ -244,16 +244,20 @@ class CounterViewModel(
         }
     }
 
-    fun generateShareSummary(): String {
+    fun createShareData(title: String? = null): com.cashq.core.sharing.CashCountShareData {
         val current = _uiState.value
-        val defaultTitle = "Cash Count — " + SimpleDateFormat("dd MMM yyyy", Locale.forLanguageTag("en-IN")).format(Date())
-        return ShareSummaryGenerator.generateSummary(
+        val defaultTitle = title ?: ("Cash Count — " + SimpleDateFormat("dd MMM yyyy", Locale.forLanguageTag("en-IN")).format(Date()))
+        return com.cashq.core.sharing.CashCountShareData.fromCounter(
             title = defaultTitle,
             timestamp = System.currentTimeMillis(),
             quantities = current.quantities,
             coinsVisible = current.coinsVisible,
             coinMode = current.coinMode
         )
+    }
+
+    fun generateShareSummary(): String {
+        return com.cashq.core.sharing.RichTextShareFormatter.format(createShareData())
     }
 
     fun clearNotification() {

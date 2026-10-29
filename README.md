@@ -58,9 +58,11 @@ Because ₹20 and ₹10 circulate simultaneously as banknotes and coins in India
 - **Quick Reload & Review:** Inspect past counting sessions or load them directly back into the live counter.
 - **Instant Search & Cleanup:** Search sessions by title and safely delete records with confirmation protection.
 
-### 📤 5. Native Sharesheet Integration
-- Exports detailed, plain-text counting breakdown summaries through the native Android Sharesheet (compatible with WhatsApp, SMS, Email, Notes, etc.).
-- Clearly indicates whether coins were excluded or combined mode was utilized.
+### 📤 5. Premium Multi-Format Sharing
+When tapping **Share** on either the live Counter or any saved History session, CashQ opens a Material 3 format selection sheet offering three specialized options:
+- **📝 Rich Text:** Unicode and emoji-structured cash summary (`💰`, `💵`, `🪙`, `💎`, `📦`) with clean horizontal dividers (`━━━━━━━━━━━━━━━━━━`) optimized for instant readability on WhatsApp, Telegram, and SMS.
+- **🖼️ Summary Card (Image):** High-resolution, unclipped branded receipt card rendered directly on device. Includes an interactive preview dialog allowing the user to select between **Light** and **Dark** card styles, save to the public `Pictures/CashQ` gallery via `MediaStore`, or share across apps using a secure `FileProvider` content URI.
+- **✉️ Email (HTML):** Professional, email-client-compatible HTML email body featuring inline CSS, clean tabular layout, accessible contrast, rupee currency symbols, and dynamic HTML entity escaping, paired with a plain-text fallback.
 
 ### 🎨 6. Material 3 & Theme Personalization
 - Supports **System Default**, **Light Theme**, and **Dark Theme**.

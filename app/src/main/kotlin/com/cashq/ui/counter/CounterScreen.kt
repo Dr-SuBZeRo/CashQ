@@ -81,6 +81,10 @@ fun CounterScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
+    var showShareFormatDialog by remember { mutableStateOf(false) }
+    var showImagePreviewDialog by remember { mutableStateOf(false) }
+    var activeShareData by remember { mutableStateOf<com.cashq.core.sharing.CashCountShareData?>(null) }
+
     LaunchedEffect(uiState.userNotification) {
         uiState.userNotification?.let { message ->
             scope.launch {
@@ -97,14 +101,8 @@ fun CounterScreen(
         onToggleCoins = { viewModel.onToggleCoinsVisible(it) },
         onSaveClick = { viewModel.openSaveDialog() },
         onShareClick = {
-            val summary = viewModel.generateShareSummary()
-            val sendIntent = Intent().apply {
-                action = Intent.ACTION_SEND
-                putExtra(Intent.EXTRA_TEXT, summary)
-                type = "text/plain"
-            }
-            val shareIntent = Intent.createChooser(sendIntent, "Share Cash Summary")
-            context.startActivity(shareIntent)
+            activeShareData = viewModel.createShareData()
+            showShareFormatDialog = true
         },
         onResetClick = { viewModel.openResetDialog() },
         onDismissSave = { viewModel.dismissSaveDialog() },
@@ -115,6 +113,36 @@ fun CounterScreen(
         onConfirmModeChange = { viewModel.confirmModeChange() },
         modifier = modifier
     )
+
+    activeShareData?.let { data ->
+        if (showShareFormatDialog) {
+            com.cashq.ui.sharing.ShareFormatSelectionDialog(
+                shareData = data,
+                onDismiss = { showShareFormatDialog = false },
+                onSelectFormat = { format ->
+                    showShareFormatDialog = false
+                    when (format) {
+                        com.cashq.ui.sharing.ShareFormat.RICH_TEXT -> {
+                            com.cashq.core.sharing.ShareManager.shareRichText(context, data)
+                        }
+                        com.cashq.ui.sharing.ShareFormat.EMAIL -> {
+                            com.cashq.core.sharing.ShareManager.shareEmail(context, data)
+                        }
+                        com.cashq.ui.sharing.ShareFormat.IMAGE -> {
+                            showImagePreviewDialog = true
+                        }
+                    }
+                }
+            )
+        }
+
+        if (showImagePreviewDialog) {
+            com.cashq.ui.sharing.SummaryCardPreviewDialog(
+                shareData = data,
+                onDismiss = { showImagePreviewDialog = false }
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

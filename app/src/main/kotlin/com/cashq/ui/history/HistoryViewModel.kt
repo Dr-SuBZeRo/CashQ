@@ -72,19 +72,12 @@ class HistoryViewModel(
         _uiState.update { it.copy(selectedSessionForDetails = null) }
     }
 
+    fun createShareData(session: SavedSessionEntity): com.cashq.core.sharing.CashCountShareData {
+        return com.cashq.core.sharing.CashCountShareData.fromSavedSession(session)
+    }
+
     fun generateShareSummary(session: SavedSessionEntity): String {
-        val mode = try {
-            CoinCountingMode.valueOf(session.coinMode)
-        } catch (_: Exception) {
-            CoinCountingMode.SEPARATE
-        }
-        return ShareSummaryGenerator.generateSummary(
-            title = session.title,
-            timestamp = session.createdAt,
-            quantities = session.getQuantitiesMap(),
-            coinsVisible = session.coinsVisible,
-            coinMode = mode
-        )
+        return com.cashq.core.sharing.RichTextShareFormatter.format(createShareData(session))
     }
 
     fun clearNotification() {

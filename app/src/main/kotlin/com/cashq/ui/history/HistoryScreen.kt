@@ -46,8 +46,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -77,6 +79,10 @@ fun HistoryScreen(
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    var shareDataToShare by remember { mutableStateOf<com.cashq.core.sharing.CashCountShareData?>(null) }
+    var showShareFormatDialog by remember { mutableStateOf(false) }
+    var showImagePreviewDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.userNotification) {
         uiState.userNotification?.let { message ->
@@ -146,14 +152,8 @@ fun HistoryScreen(
                             session = session,
                             onOpenDetails = { viewModel.openDetails(session) },
                             onShare = {
-                                val summary = viewModel.generateShareSummary(session)
-                                val sendIntent = Intent().apply {
-                                    action = Intent.ACTION_SEND
-                                    putExtra(Intent.EXTRA_TEXT, summary)
-                                    type = "text/plain"
-                                }
-                                val shareIntent = Intent.createChooser(sendIntent, "Share Cash Summary")
-                                context.startActivity(shareIntent)
+                                shareDataToShare = viewModel.createShareData(session)
+                                showShareFormatDialog = true
                             },
                             onLoad = { onLoadSessionIntoCounter(session) },
                             onDelete = { viewModel.requestDelete(session) }
@@ -198,8 +198,43 @@ fun HistoryScreen(
     uiState.selectedSessionForDetails?.let { session ->
         SessionBreakdownDialog(
             session = session,
-            onDismiss = { viewModel.closeDetails() }
+            onDismiss = { viewModel.closeDetails() },
+            onShare = {
+                shareDataToShare = viewModel.createShareData(session)
+                showShareFormatDialog = true
+            }
         )
+    }
+
+    // Share Format Selection Dialog
+    shareDataToShare?.let { data ->
+        if (showShareFormatDialog) {
+            com.cashq.ui.sharing.ShareFormatSelectionDialog(
+                shareData = data,
+                onDismiss = { showShareFormatDialog = false },
+                onSelectFormat = { format ->
+                    showShareFormatDialog = false
+                    when (format) {
+                        com.cashq.ui.sharing.ShareFormat.RICH_TEXT -> {
+                            com.cashq.core.sharing.ShareManager.shareRichText(context, data)
+                        }
+                        com.cashq.ui.sharing.ShareFormat.EMAIL -> {
+                            com.cashq.core.sharing.ShareManager.shareEmail(context, data)
+                        }
+                        com.cashq.ui.sharing.ShareFormat.IMAGE -> {
+                            showImagePreviewDialog = true
+                        }
+                    }
+                }
+            )
+        }
+
+        if (showImagePreviewDialog) {
+            com.cashq.ui.sharing.SummaryCardPreviewDialog(
+                shareData = data,
+                onDismiss = { showImagePreviewDialog = false }
+            )
+        }
     }
 }
 
@@ -371,7 +406,8 @@ fun EmptyHistoryState(
 @Composable
 fun SessionBreakdownDialog(
     session: SavedSessionEntity,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onShare: () -> Unit = {}
 ) {
     val quantities = remember(session) { session.getQuantitiesMap() }
     val mode = remember(session.coinMode) {
@@ -435,6 +471,16 @@ fun SessionBreakdownDialog(
         confirmButton = {
             Button(onClick = onDismiss) {
                 Text("Close")
+            }
+        },
+        dismissButton = {
+            OutlinedButton(onClick = {
+                onDismiss()
+                onShare()
+            }) {
+                Icon(Icons.Filled.Share, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(6.dp))
+                Text("Share")
             }
         }
     )
