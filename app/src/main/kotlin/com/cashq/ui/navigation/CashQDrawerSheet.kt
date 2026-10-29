@@ -72,11 +72,8 @@ fun CashQDrawerSheet(
                     )
                     Spacer(modifier = Modifier.width(14.dp))
                     Column {
-                        Text(
-                            text = "CashQ",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
+                        CashQWordmark(
+                            style = MaterialTheme.typography.titleLarge
                         )
                         Text(
                             text = "Indian Rupee Cash Counter",

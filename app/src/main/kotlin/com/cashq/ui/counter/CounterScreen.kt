@@ -472,10 +472,6 @@ fun DenominationRow(
     onDone: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var rawText by remember(quantity) {
-        mutableStateOf(if (quantity > 0) quantity.toString() else "")
-    }
-
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -532,25 +528,10 @@ fun DenominationRow(
             Spacer(modifier = Modifier.width(12.dp))
 
             // Quantity Input Field
-            OutlinedTextField(
-                value = rawText,
-                onValueChange = { input ->
-                    val filtered = input.filter { it.isDigit() }
-                    rawText = filtered
-                    onQuantityChanged(filtered)
-                },
-                placeholder = { Text("0", textAlign = TextAlign.Center) },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(onNext = { onDone() }),
-                textStyle = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.SemiBold,
-                    textAlign = TextAlign.Center
-                ),
-                shape = RoundedCornerShape(8.dp),
+            CleanNumberInputField(
+                quantity = quantity,
+                onQuantityChanged = onQuantityChanged,
+                onDone = onDone,
                 modifier = Modifier
                     .width(100.dp)
                     .height(56.dp)

@@ -10,7 +10,7 @@
   [![Language](https://img.shields.io/badge/Kotlin-2.3.20-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)](https://kotlinlang.org)
   [![Toolkit](https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white)](https://developer.android.com/jetpack/compose)
   [![Architecture](https://img.shields.io/badge/Architecture-Offline--First%20%7C%20UDF-009688?style=for-the-badge)]()
-  [![Release](https://img.shields.io/badge/Version-1.1.0-blue?style=for-the-badge)](https://github.com/Dr-SuBZeRo/CashQ/releases)
+  [![Release](https://img.shields.io/badge/Version-1.2.0-blue?style=for-the-badge)](https://github.com/Dr-SuBZeRo/CashQ/releases)
 
   <p align="center">
     Designed for retail cashiers, pharmacies, clinics, small businesses, and daily personal cash management. Count notes and coins with real-time calculations, zero cloud dependencies, and zero tracking.
@@ -28,7 +28,7 @@
 
 - **Developer:** SuBZeRo
 - **Application ID:** `com.cashq`
-- **Current Version:** `1.1.0` (`versionCode 2`)
+- **Current Version:** `1.2.0` (`versionCode 3`)
 - **Min SDK:** Android 8.0 (API 26)
 - **Target / Compile SDK:** Android 16 (API 36)
 
@@ -173,6 +173,27 @@ Connect your Android device with USB debugging enabled, then run:
 ```powershell
 adb install -r app\build\outputs\apk\debug\app-debug.apk
 ```
+
+---
+
+## 🏷️ Release Versioning Workflow
+
+CashQ follows Semantic Versioning (`MAJOR.MINOR.PATCH`) paired with a strictly incrementing Android `versionCode`:
+
+1. **Patch increment (`x.y.Z`)**:
+   - For bug fixes, typographical changes, and minor internal corrections that do not alter the UI structure or add features.
+   - Example: `1.2.0` -> `1.2.1`.
+2. **Minor increment (`x.Y.0`)**:
+   - For backward-compatible new features, UI refinements, header redesigns, and new capabilities.
+   - Example: `1.1.0` -> `1.2.0`.
+3. **Major increment (`X.0.0`)**:
+   - For major architectural overhauls, significant database schema migrations, or fundamental breaking workflow changes.
+   - Example: `1.2.0` -> `2.0.0`.
+
+### Versioning Rules:
+- **`versionCode` Rule:** Every release must increment `versionCode` by at least `+1` (e.g. `2` -> `3`).
+- **Uniqueness Rule:** Never reuse a published version name or version code.
+- **Single Source of Truth:** `versionName` and `versionCode` in `app/build.gradle.kts` automatically generate `BuildConfig.VERSION_NAME` and `BuildConfig.VERSION_CODE`, powering the Settings screen, About cards, navigation drawer, and GitHub update comparison logic dynamically.
 
 ---
 
