@@ -29,7 +29,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
@@ -44,7 +43,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -68,12 +66,14 @@ import com.cashq.R
 import com.cashq.core.formatting.CurrencyFormatter
 import com.cashq.domain.model.CurrencyType
 import com.cashq.domain.model.Denomination
+import com.cashq.ui.navigation.CashQTopAppBar
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CounterScreen(
     viewModel: CounterViewModel,
+    onOpenDrawer: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -97,6 +97,7 @@ fun CounterScreen(
     CounterScreenContent(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
+        onOpenDrawer = onOpenDrawer,
         onQuantityChanged = { id, raw -> viewModel.onQuantityChanged(id, raw) },
         onToggleCoins = { viewModel.onToggleCoinsVisible(it) },
         onSaveClick = { viewModel.openSaveDialog() },
@@ -150,6 +151,7 @@ fun CounterScreen(
 fun CounterScreenContent(
     uiState: CounterUiState,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    onOpenDrawer: () -> Unit = {},
     onQuantityChanged: (String, String) -> Unit = { _, _ -> },
     onToggleCoins: (Boolean) -> Unit = {},
     onSaveClick: () -> Unit = {},
@@ -169,29 +171,10 @@ fun CounterScreenContent(
         modifier = modifier,
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.cashq_logo),
-                            contentDescription = androidx.compose.ui.res.stringResource(R.string.app_name),
-                            modifier = Modifier.size(32.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = androidx.compose.ui.res.stringResource(R.string.app_name),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+            CashQTopAppBar(
+                title = "CashQ",
+                subtitle = "Indian Rupee Cash Counter",
+                onOpenDrawer = onOpenDrawer
             )
         }
     ) { innerPadding ->
@@ -200,7 +183,7 @@ fun CounterScreenContent(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item {
                 Spacer(modifier = Modifier.height(4.dp))
@@ -303,7 +286,7 @@ fun TotalCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -316,7 +299,7 @@ fun TotalCard(
 
             Text(
                 text = CurrencyFormatter.formatRupees(totalRupees),
-                style = MaterialTheme.typography.displayMedium.copy(fontSize = 38.sp),
+                style = MaterialTheme.typography.displayMedium.copy(fontSize = 34.sp),
                 fontWeight = FontWeight.ExtraBold,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
@@ -507,7 +490,7 @@ fun DenominationRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 10.dp),
+                .padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Denomination Badge

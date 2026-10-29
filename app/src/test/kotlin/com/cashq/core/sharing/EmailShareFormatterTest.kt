@@ -55,8 +55,9 @@ class EmailShareFormatterTest {
         assertTrue(html.startsWith("<!DOCTYPE html>"))
         assertTrue(html.contains("<html lang=\"en\">"))
         assertTrue(html.contains("</html>"))
-        assertTrue(html.contains("💰 CashQ"))
+        assertTrue(html.contains("CashQ"))
         assertTrue(html.contains("Indian Rupee Cash Counter"))
+        assertTrue(html.contains("CASH COUNT REPORT"))
 
         // Escaped title
         assertTrue(html.contains("Store &amp; Clinic &lt;Evening&gt;"))
@@ -67,16 +68,26 @@ class EmailShareFormatterTest {
         assertTrue(html.contains("257 units counted"))
 
         // Subtotals
-        assertTrue(html.contains("Notes Subtotal:</strong> ₹2,000 (7 units)"))
-        assertTrue(html.contains("Coins Subtotal:</strong> ₹2,000 (250 units)"))
+        assertTrue(html.contains("Banknotes Subtotal:</strong>"))
+        assertTrue(html.contains("₹2,000"))
+        assertTrue(html.contains("Coins Subtotal:</strong>"))
 
-        // Denominations table
+        // 3-column table structure
+        assertTrue(html.contains("<th style=\"padding:10px 14px;\">Denomination</th>"))
+        assertTrue(html.contains("<th style=\"padding:10px 14px;text-align:right;\">Count</th>"))
+        assertTrue(html.contains("<th style=\"padding:10px 14px;text-align:right;\">Subtotal</th>"))
+
+        // Denominations table and section headings in separate mode
+        assertTrue(html.contains("💵 Banknotes"))
+        assertTrue(html.contains("🪙 Coins"))
         assertTrue(html.contains("₹500 Note"))
         assertTrue(html.contains("× 2"))
         assertTrue(html.contains("₹1,000"))
 
-        // Footer attribution
-        assertTrue(html.contains("SuBZeRo"))
+        // Final total closing summary & footer attribution
+        assertTrue(html.contains("Final Total:"))
+        assertTrue(html.contains("Created with <strong>CashQ</strong> by SuBZeRo"))
+        assertTrue(html.contains("100% Offline &amp; Private"))
     }
 
     @Test
@@ -93,6 +104,35 @@ class EmailShareFormatterTest {
 
         assertTrue(html.contains("Mode: Banknotes Only (Coins Hidden)"))
         assertTrue(html.contains("TOTAL CASH (Notes Only)"))
-        assertFalse(html.contains("Coins Subtotal:"))
+        assertTrue(html.contains("NOTES ONLY · Coins excluded from count"))
+        assertFalse(html.contains("🪙 Coins Subtotal:"))
+        assertFalse(html.contains("🪙 Coins</th>"))
+    }
+
+    @Test
+    fun formatHtml_combinedMode_displaysCombinedSectionHeadingAndMergedRows() {
+        val quantities = mapOf(
+            Denomination.NOTE_500.id to 2, // ₹1,000
+            Denomination.COMBINED_20.id to 10, // ₹200
+            Denomination.COMBINED_10.id to 5,  // ₹50
+            Denomination.COIN_5.id to 20       // ₹100
+        )
+
+        val shareData = CashCountShareData.fromCounter(
+            title = "Combined Register",
+            timestamp = 1730180000000L,
+            quantities = quantities,
+            coinsVisible = true,
+            coinMode = CoinCountingMode.COMBINED
+        )
+
+        val html = EmailShareFormatter.formatHtml(shareData)
+
+        assertTrue(html.contains("Mode: Combined ₹20 &amp; ₹10 Denominations"))
+        assertTrue(html.contains("💵 Banknotes &amp; Combined Denominations"))
+        assertTrue(html.contains("₹20 (Note + Coin)"))
+        assertTrue(html.contains("₹10 (Note + Coin)"))
+        assertTrue(html.contains("🪙 Coins (₹5, ₹2, ₹1)"))
+        assertTrue(html.contains("₹1,350"))
     }
 }

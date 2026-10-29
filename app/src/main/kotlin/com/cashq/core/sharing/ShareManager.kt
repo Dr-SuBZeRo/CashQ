@@ -53,7 +53,8 @@ object ShareManager {
 
         try {
             if (sendToIntent.resolveActivity(context.packageManager) != null) {
-                context.startActivity(sendToIntent)
+                val chooser = Intent.createChooser(sendToIntent, "Send Cash Summary via Email")
+                context.startActivity(chooser)
                 return
             }
         } catch (_: Exception) {

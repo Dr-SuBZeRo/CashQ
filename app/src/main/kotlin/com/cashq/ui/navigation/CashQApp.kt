@@ -1,22 +1,17 @@
 package com.cashq.ui.navigation
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Calculate
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cashq.CashQApplication
@@ -29,26 +24,18 @@ import com.cashq.ui.history.HistoryViewModelFactory
 import com.cashq.ui.settings.SettingsScreen
 import com.cashq.ui.settings.SettingsViewModel
 import com.cashq.ui.settings.SettingsViewModelFactory
-
-private data class BottomNavItem(
-    val label: String,
-    val icon: ImageVector,
-    val index: Int
-)
-
-private val bottomNavItems = listOf(
-    BottomNavItem("Counter", Icons.Filled.Calculate, 0),
-    BottomNavItem("History", Icons.Filled.History, 1),
-    BottomNavItem("Settings", Icons.Filled.Settings, 2)
-)
+import kotlinx.coroutines.launch
 
 /**
- * Root composable for CashQ. Hosts a [Scaffold] with Material 3 bottom navigation
- * and switches between Counter, History, and Settings screens.
+ * Root composable for CashQ. Hosts a [ModalNavigationDrawer] and switches
+ * between Counter, History, and Settings screens. Bottom navigation bar has been removed.
  */
 @Composable
 fun CashQApp() {
-    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+    var selectedDestination by rememberSaveable { mutableStateOf(CashQDestination.COUNTER) }
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
     val context = LocalContext.current
     val app = context.applicationContext as CashQApplication
 
@@ -64,38 +51,45 @@ fun CashQApp() {
         factory = SettingsViewModelFactory(app.preferencesManager)
     )
 
-    Scaffold(
-        bottomBar = {
-            NavigationBar {
-                bottomNavItems.forEach { item ->
-                    NavigationBarItem(
-                        icon = { Icon(item.icon, contentDescription = item.label) },
-                        label = { Text(item.label) },
-                        selected = selectedTab == item.index,
-                        onClick = { selectedTab = item.index }
-                    )
+    // Back button dismisses the drawer if it is open
+    BackHandler(enabled = drawerState.isOpen) {
+        scope.launch { drawerState.close() }
+    }
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            CashQDrawerSheet(
+                selectedDestination = selectedDestination,
+                onDestinationSelected = { destination ->
+                    selectedDestination = destination
+                    scope.launch { drawerState.close() }
                 }
-            }
-        }
-    ) { innerPadding ->
-        when (selectedTab) {
-            0 -> CounterScreen(
+            )
+        },
+        modifier = Modifier.fillMaxSize()
+    ) {
+        when (selectedDestination) {
+            CashQDestination.COUNTER -> CounterScreen(
                 viewModel = counterViewModel,
-                modifier = Modifier.padding(innerPadding)
+                onOpenDrawer = { scope.launch { drawerState.open() } },
+                modifier = Modifier.fillMaxSize()
             )
 
-            1 -> HistoryScreen(
+            CashQDestination.HISTORY -> HistoryScreen(
                 viewModel = historyViewModel,
                 onLoadSessionIntoCounter = { session ->
                     counterViewModel.loadSession(session)
-                    selectedTab = 0
+                    selectedDestination = CashQDestination.COUNTER
                 },
-                modifier = Modifier.padding(innerPadding)
+                onOpenDrawer = { scope.launch { drawerState.open() } },
+                modifier = Modifier.fillMaxSize()
             )
 
-            2 -> SettingsScreen(
+            CashQDestination.SETTINGS -> SettingsScreen(
                 viewModel = settingsViewModel,
-                modifier = Modifier.padding(innerPadding)
+                onOpenDrawer = { scope.launch { drawerState.open() } },
+                modifier = Modifier.fillMaxSize()
             )
         }
     }
